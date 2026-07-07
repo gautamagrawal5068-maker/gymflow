@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymFlow — Classes</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">ADMIN CONSOLE</span>
+      <span class="brand-name">GymFlow</span>
+    </div>
+    <a class="nav-item {{ 'active' if active=='dashboard' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a class="nav-item {{ 'active' if active=='members' }}" href="{{ url_for('admin_members') }}">Members</a>
+    <a class="nav-item {{ 'active' if active=='classes' }}" href="{{ url_for('admin_classes') }}">Classes</a>
+    <a class="nav-item {{ 'active' if active=='staff' }}" href="{{ url_for('admin_staff') }}">Staff</a>
+  </div>
+
+  <div class="main">
+    <div class="view-header">
+      <div>
+        <div class="view-title">Classes</div>
+        <div class="view-sub">Schedule classes. Bookings made by members update these numbers live.</div>
+      </div>
+      <button class="btn" onclick="document.getElementById('add-class-box').classList.toggle('open')">+ Add Class</button>
+    </div>
+
+    <div class="add-box" id="add-class-box">
+      <form method="POST" action="{{ url_for('admin_classes') }}">
+        <div class="add-grid">
+          <div class="field"><label>Class Name</label><input name="name" type="text" placeholder="e.g. Morning HIIT" required></div>
+          <div class="field"><label>Trainer</label><input name="trainer" type="text" placeholder="e.g. Aditi Rao" required></div>
+          <div class="field"><label>Time</label><input name="time" type="text" placeholder="e.g. Mon/Wed/Fri — 7:00 AM" required></div>
+          <div class="field"><label>Capacity (total slots)</label><input name="capacity" type="number" min="1" value="12" required></div>
+        </div>
+        <button class="btn" type="submit">Add Class</button>
+      </form>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Class</th><th>Trainer</th><th>Time</th><th>Capacity</th><th></th></tr></thead>
+        <tbody>
+          {% if classes|length == 0 %}
+          <tr class="empty-row"><td colspan="5">No classes scheduled yet.</td></tr>
+          {% endif %}
+          {% for c in classes %}
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.trainer }}</td>
+            <td>{{ c.time }}</td>
+            <td>
+              <div class="capacity-row">
+                <div class="plate-stack">
+                  {% for i in range(c.capacity) %}
+                    <div class="plate {{ 'filled' if i < c.booked }}"></div>
+                  {% endfor %}
+                </div>
+                <span class="capacity-text">{{ c.booked }}/{{ c.capacity }}</span>
+              </div>
+            </td>
+            <td>
+              <form method="POST" action="{{ url_for('admin_classes_delete', class_id=c.id) }}"
+                    onsubmit="return confirm('Remove {{ c.name }}? This cannot be undone.');">
+                <button class="btn-ghost btn-sm" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

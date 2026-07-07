@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymFlow — Staff</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">ADMIN CONSOLE</span>
+      <span class="brand-name">GymFlow</span>
+    </div>
+    <a class="nav-item {{ 'active' if active=='dashboard' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a class="nav-item {{ 'active' if active=='members' }}" href="{{ url_for('admin_members') }}">Members</a>
+    <a class="nav-item {{ 'active' if active=='classes' }}" href="{{ url_for('admin_classes') }}">Classes</a>
+    <a class="nav-item {{ 'active' if active=='staff' }}" href="{{ url_for('admin_staff') }}">Staff</a>
+  </div>
+
+  <div class="main">
+    <div class="view-header">
+      <div>
+        <div class="view-title">Staff</div>
+        <div class="view-sub">Trainers and front-desk accounts</div>
+      </div>
+      <button class="btn" onclick="document.getElementById('add-staff-box').classList.toggle('open')">+ Add Staff</button>
+    </div>
+
+    <div class="add-box" id="add-staff-box">
+      <form method="POST" action="{{ url_for('admin_staff') }}">
+        <div class="add-grid">
+          <div class="field"><label>Full Name</label><input name="name" type="text" placeholder="e.g. Karan Bhatt" required></div>
+          <div class="field"><label>Role</label>
+            <select name="role"><option>Trainer</option><option>Front Desk</option><option>Manager</option></select>
+          </div>
+          <div class="field"><label>Email</label><input name="email" type="email" placeholder="karan@gymflow.com" required></div>
+        </div>
+        <button class="btn" type="submit">Add Staff</button>
+      </form>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Role</th><th>Email</th><th></th></tr></thead>
+        <tbody>
+          {% if staff|length == 0 %}
+          <tr class="empty-row"><td colspan="4">No staff added yet.</td></tr>
+          {% endif %}
+          {% for s in staff %}
+          <tr>
+            <td>{{ s.name }}</td>
+            <td>{{ s.role }}</td>
+            <td>{{ s.email }}</td>
+            <td>
+              <form method="POST" action="{{ url_for('admin_staff_delete', staff_id=s.id) }}"
+                    onsubmit="return confirm('Remove {{ s.name }}? This cannot be undone.');">
+                <button class="btn-ghost btn-sm" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

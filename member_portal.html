@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymFlow — My Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-brand">GymFlow<span>MEMBER PORTAL</span></div>
+    <div class="topbar-right">
+      <div class="topbar-name">{{ member.name }}</div>
+      <a href="{{ url_for('member_logout') }}"><button class="btn-ghost btn-sm">Log Out</button></a>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">Your Membership</div>
+        <div class="plan-name">{{ member.plan }} Plan</div>
+        <div class="plan-expiry">Expires {{ member.expiry }}</div>
+        <span class="pill {{ member.status }}">{{ member.status }}</span>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Check In</div>
+        <form method="POST" action="{{ url_for('member_checkin') }}">
+          <button class="btn btn-teal btn-full" type="submit">Check In Now</button>
+        </form>
+        <div class="plan-expiry" style="margin-top:12px;">
+          {% if attendance|length > 0 %}
+            Last check-in: {{ attendance[0].timestamp }}
+          {% else %}
+            No check-ins yet.
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Notifications</div>
+    {% if days_left <= 5 %}
+      <div class="notif">⚠️ Your membership expires in {{ days_left }} day{{ '' if days_left == 1 else 's' }}. Please see the front desk to renew.</div>
+    {% endif %}
+    {% if member.status == 'overdue' %}
+      <div class="notif">⚠️ You have an overdue payment. Please see the front desk to clear it and avoid losing access.</div>
+    {% endif %}
+    {% if days_left > 5 and member.status != 'overdue' %}
+      <div class="notif empty">You're all caught up — no notifications right now.</div>
+    {% endif %}
+
+    <div class="section-title">Available Classes</div>
+    {% for c in classes %}
+      {% set is_booked = c.id in my_bookings %}
+      {% set is_full = c.booked >= c.capacity and not is_booked %}
+      <div class="class-row">
+        <div class="class-info">
+          <h4>{{ c.name }}</h4>
+          <p>{{ c.trainer }} · {{ c.time }}</p>
+        </div>
+        <div class="class-action">
+          <div class="plate-stack">
+            {% for i in range(c.capacity) %}
+              <div class="plate {{ 'filled' if i < c.booked }}"></div>
+            {% endfor %}
+          </div>
+          <span class="capacity-text">{{ c.booked }}/{{ c.capacity }}</span>
+          <form method="POST" action="{{ url_for('member_book', class_id=c.id) }}">
+            <button class="btn-book {{ 'booked' if is_booked }}" type="submit" {{ 'disabled' if is_full }}>
+              {{ 'Cancel' if is_booked else ('Full' if is_full else 'Book') }}
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="section-title">Attendance History</div>
+    <div class="card">
+      {% if attendance|length == 0 %}
+        <div class="empty-state">No check-ins logged yet.</div>
+      {% else %}
+        {% for a in attendance %}
+          <div class="attendance-item"><span>{{ a.timestamp }}</span><span>✓ Checked in</span></div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+</body>
+</html>

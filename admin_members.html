@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymFlow — Members</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">ADMIN CONSOLE</span>
+      <span class="brand-name">GymFlow</span>
+    </div>
+    <a class="nav-item {{ 'active' if active=='dashboard' }}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a class="nav-item {{ 'active' if active=='members' }}" href="{{ url_for('admin_members') }}">Members</a>
+    <a class="nav-item {{ 'active' if active=='classes' }}" href="{{ url_for('admin_classes') }}">Classes</a>
+    <a class="nav-item {{ 'active' if active=='staff' }}" href="{{ url_for('admin_staff') }}">Staff</a>
+  </div>
+
+  <div class="main">
+    <div class="view-header">
+      <div>
+        <div class="view-title">Members</div>
+        <div class="view-sub">Manage member accounts and payment status. Members who self-register through the member portal also appear here automatically.</div>
+      </div>
+      <button class="btn" onclick="document.getElementById('add-member-box').classList.toggle('open')">+ Add Member</button>
+    </div>
+
+    <div class="add-box" id="add-member-box">
+      <form method="POST" action="{{ url_for('admin_members') }}">
+        <div class="add-grid">
+          <div class="field"><label>Full Name</label><input name="name" type="text" placeholder="e.g. Rohan Mehta" required></div>
+          <div class="field"><label>Email</label><input name="email" type="email" placeholder="rohan@email.com" required></div>
+          <div class="field"><label>Plan</label>
+            <select name="plan">
+              <option>Monthly</option><option>Quarterly</option><option>Annual</option>
+            </select>
+          </div>
+          <div class="field"><label>Payment Status</label>
+            <select name="status">
+              <option value="paid">Paid</option><option value="pending">Pending</option><option value="overdue">Overdue</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" type="submit">Add Member</button>
+      </form>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Payment</th><th>Joined</th><th>Expiry</th><th></th></tr></thead>
+        <tbody>
+          {% if members|length == 0 %}
+          <tr class="empty-row"><td colspan="7">No members yet — click "Add Member" to get started.</td></tr>
+          {% endif %}
+          {% for m in members %}
+          <tr>
+            <td>{{ m.name }}</td>
+            <td>{{ m.email }}</td>
+            <td>{{ m.plan }}</td>
+            <td><span class="pill {{ m.status }}">{{ m.status }}</span></td>
+            <td>{{ m.joined }}</td>
+            <td>{{ m.expiry }}</td>
+            <td>
+              <form method="POST" action="{{ url_for('admin_members_delete', member_id=m.id) }}"
+                    onsubmit="return confirm('Remove {{ m.name }}? This cannot be undone.');">
+                <button class="btn-ghost btn-sm" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

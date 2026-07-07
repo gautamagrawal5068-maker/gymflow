@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymFlow — Member Portal</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="auth-screen">
+    <div class="auth-card">
+      <span class="auth-mark">MEMBER PORTAL</span>
+      <div class="auth-title">GymFlow</div>
+      <div class="auth-sub">Sign in to book classes, check in, and manage your membership.</div>
+
+      <form method="POST" action="{{ url_for('member_register') }}">
+        <div class="field">
+          <label>Full Name</label>
+          <input name="name" type="text" placeholder="e.g. Ananya Kapoor" required>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input name="email" type="email" placeholder="you@email.com" required>
+        </div>
+        <div class="field">
+          <label>Plan</label>
+          <select name="plan">
+            <option>Monthly</option>
+            <option>Quarterly</option>
+            <option>Annual</option>
+          </select>
+        </div>
+        <button class="btn btn-full" type="submit">Continue</button>
+      </form>
+
+      <div class="auth-note">
+        New here? This creates your account. Already registered? Enter the same email
+        you used before and you'll be signed back into your existing account —
+        this is stored in the shared GymFlow database, so admins can see it too.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
